@@ -72,10 +72,10 @@ export const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-hero p-6">
-      <Card className="w-full max-w-md p-8 shadow-card">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-6">
+      <Card className="w-full max-w-md p-8 shadow-card border border-border">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold mb-2">Resume Builder</h2>
+          <h2 className="text-3xl font-bold mb-2 gradient-vibrant bg-clip-text text-transparent">Resume Builder</h2>
           <p className="text-muted-foreground">Sign in to access your resumes</p>
         </div>
 
@@ -109,7 +109,7 @@ export const Auth = () => {
                   required
                 />
               </div>
-              <Button type="submit" disabled={loading} className="w-full gradient-primary text-white">
+              <Button type="submit" disabled={loading} className="w-full gradient-vibrant text-white">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -147,7 +147,7 @@ export const Auth = () => {
                   minLength={6}
                 />
               </div>
-              <Button type="submit" disabled={loading} className="w-full gradient-primary text-white">
+              <Button type="submit" disabled={loading} className="w-full gradient-vibrant text-white">
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

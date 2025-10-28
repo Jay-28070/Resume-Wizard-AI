@@ -47,13 +47,13 @@ export const ResumeUpload = ({ onSuccess }: ResumeUploadProps) => {
   };
 
   return (
-    <Card className="p-8 shadow-card transition-smooth hover:shadow-glow">
+    <Card className="p-8 shadow-card border border-border">
       <div className="flex flex-col items-center text-center space-y-4">
-        <div className="rounded-full gradient-primary p-4">
+        <div className="rounded-full gradient-vibrant p-4">
           <Upload className="h-8 w-8 text-white" />
         </div>
         <div>
-          <h3 className="text-2xl font-bold mb-2">Upload Your Resume</h3>
+          <h3 className="text-2xl font-bold mb-2 text-foreground">Upload Your Resume</h3>
           <p className="text-muted-foreground">
             Upload your existing resume and let AI enhance it
           </p>
@@ -66,7 +66,7 @@ export const ResumeUpload = ({ onSuccess }: ResumeUploadProps) => {
             className="hidden"
             disabled={uploading}
           />
-          <Button disabled={uploading} size="lg" className="gradient-primary text-white">
+          <Button disabled={uploading} size="lg" className="gradient-vibrant text-white">
             {uploading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />

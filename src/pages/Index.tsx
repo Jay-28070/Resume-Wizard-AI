@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Hero } from "@/components/Hero";
 import { ResumeUpload } from "@/components/ResumeUpload";
 import { ResumeForm, type ResumeFormData } from "@/components/ResumeForm";
@@ -18,6 +18,7 @@ const Index = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [previewResume, setPreviewResume] = useState<any>(null);
   const [darkMode, setDarkMode] = useState(false);
+  const resumesRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -81,6 +82,10 @@ const Index = () => {
     }
   };
 
+  const scrollToResumes = () => {
+    resumesRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   if (!user) {
     return <Auth />;
   }
@@ -88,9 +93,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <h1 className="text-2xl font-bold gradient-card bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold gradient-vibrant bg-clip-text text-transparent">
             Resume Builder
           </h1>
           <div className="flex items-center gap-4">
@@ -110,10 +115,10 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <Hero onGetStarted={() => setShowCreateDialog(true)} />
+      <Hero onGetStarted={() => setShowCreateDialog(true)} onViewResumes={scrollToResumes} />
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-12">
+      <div ref={resumesRef} className="container mx-auto px-6 py-12">
         <ResumeDashboard session={session} onPreview={setPreviewResume} />
       </div>
 
@@ -145,7 +150,7 @@ const Index = () => {
             <DialogTitle>{previewResume?.title}</DialogTitle>
           </DialogHeader>
           <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap font-sans">{previewResume?.content}</pre>
+            <pre className="whitespace-pre-wrap font-sans text-foreground">{previewResume?.content}</pre>
           </div>
         </DialogContent>
       </Dialog>

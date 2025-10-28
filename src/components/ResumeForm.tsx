@@ -68,10 +68,10 @@ export const ResumeForm = ({ onSuccess }: ResumeFormProps) => {
   };
 
   return (
-    <Card className="p-8 shadow-card">
+    <Card className="p-8 shadow-card border border-border">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold mb-2">Create New Resume</h3>
+          <h3 className="text-2xl font-bold mb-2 text-foreground">Create New Resume</h3>
           <p className="text-muted-foreground">Fill in your details and let AI craft your resume</p>
         </div>
 
@@ -177,7 +177,7 @@ export const ResumeForm = ({ onSuccess }: ResumeFormProps) => {
           type="submit"
           disabled={generating}
           size="lg"
-          className="w-full gradient-primary text-white"
+          className="w-full gradient-vibrant text-white"
         >
           {generating ? (
             <>
