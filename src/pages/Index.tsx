@@ -54,7 +54,7 @@ const Index = () => {
     });
   };
 
-  const handleResumeSuccess = async (content: string, formData?: ResumeFormData) => {
+  const handleResumeSuccess = async (content: string, formData?: ResumeFormData, template?: string) => {
     try {
       const title = formData?.name ? `${formData.name}'s Resume` : "My Resume";
       
@@ -62,7 +62,7 @@ const Index = () => {
         user_id: user?.id,
         title,
         content,
-        template: "classic",
+        template: template || "classic",
       });
 
       if (error) throw error;
@@ -97,7 +97,7 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <h1 className="text-2xl font-bold gradient-vibrant bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-foreground">
             Resume Builder
           </h1>
           <div className="flex items-center gap-4">
@@ -131,10 +131,14 @@ const Index = () => {
               <TabsTrigger value="create">Create New</TabsTrigger>
             </TabsList>
             <TabsContent value="upload" className="mt-6">
-              <ResumeUpload onSuccess={(content) => handleResumeSuccess(content)} />
+              <ResumeUpload onSuccess={(content, template) => {
+                handleResumeSuccess(content, undefined, template);
+              }} />
             </TabsContent>
             <TabsContent value="create" className="mt-6">
-              <ResumeForm onSuccess={(content, formData) => handleResumeSuccess(content, formData)} />
+              <ResumeForm onSuccess={(content, formData, template) => {
+                handleResumeSuccess(content, formData, template);
+              }} />
             </TabsContent>
           </Tabs>
         </DialogContent>
