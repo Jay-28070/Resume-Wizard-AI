@@ -18,7 +18,7 @@ export const Hero = ({ onGetStarted, onViewResumes }: HeroProps) => {
 
           <h1 className="text-5xl font-bold leading-tight text-foreground md:text-6xl lg:text-7xl animate-slide-up">
             Create Professional Resumes
-            <span className="block mt-2 gradient-vibrant bg-clip-text text-transparent">
+            <span className="block mt-2" style={{ background: 'linear-gradient(135deg, hsl(280, 80%, 55%), hsl(320, 90%, 60%))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               That Get You Hired
             </span>
           </h1>

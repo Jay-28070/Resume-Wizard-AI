@@ -19,6 +19,7 @@ interface Resume {
 interface ResumeDashboardProps {
   session: Session | null;
   onPreview: (resume: Resume) => void;
+  refreshTrigger?: number;
 }
 
 const ResumeCard = ({ resume, onPreview, onDownload, onDelete }: any) => {
@@ -70,7 +71,7 @@ const ResumeCard = ({ resume, onPreview, onDownload, onDelete }: any) => {
   );
 };
 
-export const ResumeDashboard = ({ session, onPreview }: ResumeDashboardProps) => {
+export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDashboardProps) => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -79,7 +80,7 @@ export const ResumeDashboard = ({ session, onPreview }: ResumeDashboardProps) =>
     if (session) {
       fetchResumes();
     }
-  }, [session]);
+  }, [session, refreshTrigger]);
 
   const fetchResumes = async () => {
     try {
@@ -185,11 +186,6 @@ export const ResumeDashboard = ({ session, onPreview }: ResumeDashboardProps) =>
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2 text-foreground">My Resumes</h2>
-        <p className="text-muted-foreground">Manage and download your professional resumes</p>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {resumes.map((resume, index) => (
           <ResumeCard

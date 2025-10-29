@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Hero } from "@/components/Hero";
 import { ResumeUpload } from "@/components/ResumeUpload";
 import { ResumeForm, type ResumeFormData } from "@/components/ResumeForm";
@@ -16,9 +16,10 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showResumesDialog, setShowResumesDialog] = useState(false);
   const [previewResume, setPreviewResume] = useState<any>(null);
   const [darkMode, setDarkMode] = useState(false);
-  const resumesRef = useRef<HTMLDivElement>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,6 +73,7 @@ const Index = () => {
       });
 
       setShowCreateDialog(false);
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Save error:", error);
       toast({
@@ -82,8 +84,8 @@ const Index = () => {
     }
   };
 
-  const scrollToResumes = () => {
-    resumesRef.current?.scrollIntoView({ behavior: "smooth" });
+  const openResumesDialog = () => {
+    setShowResumesDialog(true);
   };
 
   if (!user) {
@@ -115,12 +117,7 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <Hero onGetStarted={() => setShowCreateDialog(true)} onViewResumes={scrollToResumes} />
-
-      {/* Main Content */}
-      <div ref={resumesRef} className="container mx-auto px-6 py-12">
-        <ResumeDashboard session={session} onPreview={setPreviewResume} />
-      </div>
+      <Hero onGetStarted={() => setShowCreateDialog(true)} onViewResumes={openResumesDialog} />
 
       {/* Create Resume Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -140,6 +137,16 @@ const Index = () => {
               <ResumeForm onSuccess={(content, formData) => handleResumeSuccess(content, formData)} />
             </TabsContent>
           </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      {/* Resumes Dialog */}
+      <Dialog open={showResumesDialog} onOpenChange={setShowResumesDialog}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>My Resumes</DialogTitle>
+          </DialogHeader>
+          <ResumeDashboard session={session} onPreview={setPreviewResume} refreshTrigger={refreshTrigger} />
         </DialogContent>
       </Dialog>
 
