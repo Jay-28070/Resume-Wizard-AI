@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { ResumeUpload } from "@/components/ResumeUpload";
 import { ResumeForm, type ResumeFormData } from "@/components/ResumeForm";
 import { ResumeDashboard } from "@/components/ResumeDashboard";
+import { ResumePreview } from "@/components/ResumePreview";
 import { Auth } from "@/components/Auth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -156,13 +157,17 @@ const Index = () => {
 
       {/* Preview Dialog */}
       <Dialog open={!!previewResume} onOpenChange={() => setPreviewResume(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{previewResume?.title}</DialogTitle>
           </DialogHeader>
-          <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap font-sans text-foreground">{previewResume?.content}</pre>
-          </div>
+          {previewResume && (
+            <ResumePreview 
+              content={previewResume.content}
+              template={previewResume.template}
+              title={previewResume.title}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
