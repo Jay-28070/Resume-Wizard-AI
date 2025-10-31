@@ -137,54 +137,63 @@ export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDa
       setCurrentResume(resume);
       
       // Wait for next render cycle to ensure ref is populated
-      setTimeout(async () => {
-        if (!pdfRef.current) {
-          throw new Error("PDF element not ready");
-        }
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      if (!pdfRef.current) {
+        throw new Error("PDF element not ready");
+      }
 
-        try {
-          const canvas = await html2canvas(pdfRef.current, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-          });
-          
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'letter'
-          });
-          
-          const imgWidth = 210; // Letter width in mm
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-          pdf.save(`${resume.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
-          
-          toast({
-            title: "PDF Generated",
-            description: "Your resume is ready to download",
-          });
-        } catch (error) {
-          console.error("PDF generation error:", error);
-          toast({
-            title: "Download Failed",
-            description: "Failed to generate PDF. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setGeneratingPdf(null);
-          setCurrentResume(null);
-        }
-      }, 100);
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 3,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 800,
+        windowHeight: pdfRef.current.scrollHeight,
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+      
+      // Add additional pages if content is longer than one page
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+      }
+      
+      pdf.save(`${resume.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Your resume has been saved as a PDF",
+      });
     } catch (error) {
-      console.error("Download error:", error);
+      console.error("PDF generation error:", error);
       toast({
         title: "Download Failed",
-        description: "Failed to generate PDF",
+        description: "Failed to generate PDF. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setGeneratingPdf(null);
       setCurrentResume(null);
     }
@@ -223,7 +232,7 @@ export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDa
       
       {/* Hidden PDF generator component */}
       {currentResume && (
-        <div className="fixed -left-[9999px] top-0 w-[800px]">
+        <div className="fixed top-0 left-0 pointer-events-none opacity-0 w-[800px] z-[-1]">
           <ResumePdfGenerator 
             ref={pdfRef}
             content={currentResume.content}
