@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FileText, Download, Trash2, Eye } from "lucide-react";
@@ -6,6 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import type { Session } from "@supabase/supabase-js";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { ResumePdfGenerator } from "./ResumePdfGenerator";
 
 interface Resume {
   id: string;
@@ -74,7 +77,10 @@ const ResumeCard = ({ resume, onPreview, onDownload, onDelete }: any) => {
 export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDashboardProps) => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generatingPdf, setGeneratingPdf] = useState<string | null>(null);
   const { toast } = useToast();
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const [currentResume, setCurrentResume] = useState<Resume | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -127,37 +133,51 @@ export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDa
 
   const handleDownload = async (resume: Resume) => {
     try {
-      const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; }
-            h1 { color: #7c3aed; margin-bottom: 10px; }
-            h2 { color: #a855f7; margin-top: 30px; border-bottom: 2px solid #a855f7; padding-bottom: 5px; }
-            .section { margin: 20px 0; }
-            pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
-          </style>
-        </head>
-        <body>
-          <pre>${resume.content}</pre>
-        </body>
-        </html>
-      `;
+      setGeneratingPdf(resume.id);
+      setCurrentResume(resume);
+      
+      // Wait for next render cycle to ensure ref is populated
+      setTimeout(async () => {
+        if (!pdfRef.current) {
+          throw new Error("PDF element not ready");
+        }
 
-      const { data, error } = await supabase.functions.invoke("generate-pdf", {
-        body: { html },
-      });
-
-      if (error) throw error;
-
-      window.open(data.url, "_blank");
-
-      toast({
-        title: "PDF Generated",
-        description: "Your resume is ready to download",
-      });
+        try {
+          const canvas = await html2canvas(pdfRef.current, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'letter'
+          });
+          
+          const imgWidth = 210; // Letter width in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          pdf.save(`${resume.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+          
+          toast({
+            title: "PDF Generated",
+            description: "Your resume is ready to download",
+          });
+        } catch (error) {
+          console.error("PDF generation error:", error);
+          toast({
+            title: "Download Failed",
+            description: "Failed to generate PDF. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setGeneratingPdf(null);
+          setCurrentResume(null);
+        }
+      }, 100);
     } catch (error) {
       console.error("Download error:", error);
       toast({
@@ -165,6 +185,8 @@ export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDa
         description: "Failed to generate PDF",
         variant: "destructive",
       });
+      setGeneratingPdf(null);
+      setCurrentResume(null);
     }
   };
 
@@ -198,6 +220,17 @@ export const ResumeDashboard = ({ session, onPreview, refreshTrigger }: ResumeDa
           />
         ))}
       </div>
+      
+      {/* Hidden PDF generator component */}
+      {currentResume && (
+        <div className="fixed -left-[9999px] top-0 w-[800px]">
+          <ResumePdfGenerator 
+            ref={pdfRef}
+            content={currentResume.content}
+            template={currentResume.template}
+          />
+        </div>
+      )}
     </div>
   );
 };
