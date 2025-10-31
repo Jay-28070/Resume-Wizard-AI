@@ -125,15 +125,22 @@ export const ResumeUpload = ({ onSuccess }: ResumeUploadProps) => {
           </div>
         </div>
 
-        <label className="cursor-pointer">
+        <div>
           <input
             type="file"
             accept=".txt,.doc,.docx,.pdf"
             onChange={handleFileUpload}
             className="hidden"
             disabled={uploading}
+            id="resume-upload"
           />
-          <Button disabled={uploading} size="lg" className="gradient-vibrant text-white">
+          <Button 
+            disabled={uploading} 
+            size="lg" 
+            className="gradient-vibrant text-white"
+            onClick={() => document.getElementById('resume-upload')?.click()}
+            type="button"
+          >
             {uploading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -146,7 +153,7 @@ export const ResumeUpload = ({ onSuccess }: ResumeUploadProps) => {
               </>
             )}
           </Button>
-        </label>
+        </div>
         <p className="text-xs text-muted-foreground">
           Supports TXT, DOC, DOCX, PDF formats
         </p>
