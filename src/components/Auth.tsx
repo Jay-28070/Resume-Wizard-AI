@@ -75,7 +75,7 @@ export const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-6">
       <Card className="w-full max-w-md p-8 shadow-card border border-border">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold mb-2 gradient-vibrant bg-clip-text text-transparent">Resume Builder</h2>
+          <h2 className="text-3xl font-bold mb-2 text-foreground">Resume Builder</h2>
           <p className="text-muted-foreground">Sign in to access your resumes</p>
         </div>
 
